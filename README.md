@@ -1,9 +1,20 @@
+To get going:
+
+```
 git clone https://github.com/cjw296/ddns.git
 cd ddns
 virtualenv ve
 ./ve/bin/pip install -r requirements.txt
+```
 
-@hourly ve/bin/python auth.ini https://some/url
+Sample crontab:
 
-auth.ini contents:
+```
+@hourly ve/bin/python auth.txt https://some/url
+```
+
+Sample auth.txt contents:
+
+```
 username:password
+```
