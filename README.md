@@ -10,7 +10,7 @@ virtualenv ve
 Sample crontab:
 
 ```
-@hourly ve/bin/python auth.txt https://some/url
+@hourly ve/bin/python auth.ini https://some/url
 ```
 
 Sample auth.txt contents:
