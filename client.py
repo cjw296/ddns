@@ -1,19 +1,65 @@
-import ConfigParser
-import os
-import requests
-import sys
-import requests.packages.urllib3 as urllib3
+from argparse import ArgumentParser, FileType
 
-from requests.auth import HTTPBasicAuth
+import requests
+from requests import Session
+
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument('config', type=FileType())
+    args = parser.parse_args()
+    return args
+
+
+def parse_config(raw):
+    config = {}
+    for line in raw.splitlines():
+        key, value = line.split('=', 1)
+        config[key] = value.strip()
+    return config
+
+
+def lookup_ip():
+    raw = requests.get('https://cloudflare.com/cdn-cgi/trace').text
+    return parse_config(raw)['ip']
+
 
 def main():
-    urllib3.disable_warnings()
-    path, url = sys.argv[1:]
-    with open(os.path.expanduser(path)) as auth_source:
-        username, password = auth_source.read().strip().split(':')
-    response = requests.get(url, auth=HTTPBasicAuth(username, password))
-    if response.status_code != 200 or not response.text.startswith('<SUCCESS CODE="20'):
-        print response.text
+    config = parse_config(parse_args().config.read())
+    zone_identifier = config['zone_identifier']
+    record_name = config['record_name']
+
+    base = 'https://api.cloudflare.com/client/v4'
+
+    session = Session()
+    session.headers.update({
+        'X-Auth-Email': config['auth_email'],
+        'Authorization': 'Bearer '+config['auth_token'],
+    })
+
+    response = session.get(
+        f'{base}/zones/{zone_identifier}/dns_records',
+        params={'type': 'A', 'name': record_name}
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    records_found = data['result_info']['total_count']
+    if records_found != 1:
+        raise ValueError(f'Found {records_found} records for {record_name}')
+
+    record = data['result'][0]
+
+    current_ip = lookup_ip()
+    record_ip = record['content']
+
+    if current_ip != record_ip:
+        response = session.patch(
+            f"{base}/zones/{zone_identifier}/dns_records/{record['id']}",
+            json={'content': current_ip}
+        )
+        response.raise_for_status()
+
 
 if __name__=='__main__':
     main()
