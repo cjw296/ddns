@@ -1,0 +1,8 @@
+/ve
+/*.ini
+/*.conf
+.venv
+*.md
+.gitignore
+Dockerfile
+.idea

@@ -1,15 +1,17 @@
 To get going:
 
-```
+```bash
 git clone https://github.com/cjw296/ddns.git
 cd ddns
 uv sync
+docker build -t ddns:dev .
 ```
 
 Run it:
 
 ```
 uv run client.py cloudflare.conf 
+docker run -v $(pwd)/cloudflare.conf:/cloudflare.conf ddns:dev /cloudflare.conf -v
 ```
 
 Sample cloudflare.conf contents:
