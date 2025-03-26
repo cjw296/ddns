@@ -9,6 +9,7 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument('config', type=FileType())
     parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -60,7 +61,7 @@ def main():
     current_ip = lookup_ip()
     record_ip = record['content']
 
-    if current_ip != record_ip:
+    if current_ip != record_ip or args.force:
         response = session.patch(
             f"{base}/zones/{zone_identifier}/dns_records/{record['id']}",
             json={'content': current_ip}
