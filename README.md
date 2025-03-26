@@ -3,14 +3,13 @@ To get going:
 ```
 git clone https://github.com/cjw296/ddns.git
 cd ddns
-python3 -m venv ve
-./ve/bin/pip install -r requirements.txt
+uv sync
 ```
 
-Sample crontab:
+Run it:
 
 ```
-@hourly ve/bin/python cloudflare.conf
+uv run client.py cloudflare.conf 
 ```
 
 Sample cloudflare.conf contents:
