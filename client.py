@@ -1,3 +1,4 @@
+import logging
 from argparse import ArgumentParser, FileType
 
 import requests
@@ -7,6 +8,7 @@ from requests import Session
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('config', type=FileType())
+    parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -25,7 +27,11 @@ def lookup_ip():
 
 
 def main():
-    config = parse_config(parse_args().config.read())
+    args = parse_args()
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
+    config = parse_config(args.config.read())
     zone_identifier = config['zone_identifier']
     record_name = config['record_name']
 
@@ -43,6 +49,7 @@ def main():
     )
     response.raise_for_status()
     data = response.json()
+    logging.debug(data)
 
     records_found = data['result_info']['total_count']
     if records_found != 1:
@@ -58,6 +65,7 @@ def main():
             f"{base}/zones/{zone_identifier}/dns_records/{record['id']}",
             json={'content': current_ip}
         )
+        logging.debug(response.json())
         response.raise_for_status()
 
 
