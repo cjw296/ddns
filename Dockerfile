@@ -2,6 +2,8 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 LABEL org.opencontainers.image.title="A quick and dirty image to update DDNS"
+
+# This is the one that's shown on https://github.com/cjw296/ddns/pkgs/container/ddns
 LABEL org.opencontainers.image.description="Provides a quick and dirty script to update DDNS"
 
 # Install the project into `/app`
