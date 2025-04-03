@@ -22,8 +22,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev
 
 COPY . /app
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 
-# https://github.com/astral-sh/uv/issues/12202#issuecomment-2755103920
-ENTRYPOINT [".venv/bin/python", "client.py"]
+ENV UV_NO_SYNC=true
+
+ENTRYPOINT ["uv", "run", "client.py"]
